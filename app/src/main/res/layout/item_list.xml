@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/itemContainer">
+
+    <ImageView
+        android:id="@+id/itemImg"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="18dp"
+        android:background="@color/cardview_dark_background" />
+
+    <TextView
+        android:id="@+id/itemTxtId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="18dp"
+        android:padding="8dp"
+        android:textSize="24sp"
+        android:textStyle="italic"
+        android:textColor="@color/white"
+        tools:text="id" />
+
+</RelativeLayout>
