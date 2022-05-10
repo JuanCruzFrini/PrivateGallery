@@ -18,7 +18,6 @@ class RecyclerActivityViewModel : ViewModel() {
 
     val isLoading = MutableLiveData<Boolean>()
 
-
     fun onCreate(context: Context){
         viewModelScope.launch {
             isLoading.value = true
