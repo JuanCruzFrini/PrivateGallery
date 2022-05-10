@@ -151,11 +151,8 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*")
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         startForActivityGallery.launch(intent)
+        //val intent = Intent(Intent.ACTION_GET_CONTENT)
     }
-    //Original
-    //private fun pickPhotoFromGallery(){
-    //    val intent = Intent(Intent.ACTION_GET_CONTENT).setType("image/*")
-    //    startForActivityGallery.launch(intent)}
 
     private fun enviar() { //enviar img seleccionada de gallery
         val i = Intent(Intent.ACTION_SEND)
