@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.selectfromgallery.data.ImageRepository
 import com.example.selectfromgallery.data.database.ItemEntity
 import com.example.selectfromgallery.domain.usecase.GetImagesUseCase
 import kotlinx.coroutines.launch
