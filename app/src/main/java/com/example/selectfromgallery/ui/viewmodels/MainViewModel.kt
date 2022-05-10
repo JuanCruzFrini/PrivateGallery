@@ -1,7 +1,6 @@
 package com.example.selectfromgallery.ui.viewmodels
 
 import android.content.Context
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,20 +16,21 @@ class MainViewModel : ViewModel() {
     private val _listRecycler = MutableLiveData<List<ItemEntity>>()
     val listaRecycler: LiveData<List<ItemEntity>> = _listRecycler
 
-    val isLoading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading:LiveData<Boolean> = _isLoading
 
     private val _thumbnail = MutableLiveData<ItemEntity>()
     val thumbnail: LiveData<ItemEntity> = _thumbnail
 
     fun onCreate(context: Context){
         viewModelScope.launch {
-            isLoading.value = true
+            _isLoading.value = true
             val result = GetImagesUseCase(context).invoke()
 
             if (!result.isNullOrEmpty()){
                 _listRecycler.postValue(result!!)
                 _thumbnail.postValue(result.first())
-                isLoading.value = false
+                _isLoading.value = false
             }
         }
     }
