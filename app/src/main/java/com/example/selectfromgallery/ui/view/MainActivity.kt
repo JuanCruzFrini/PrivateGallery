@@ -5,20 +5,29 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.*
+import android.os.Environment
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
+import android.provider.MediaStore
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.example.selectfromgallery.BuildConfig
 import com.example.selectfromgallery.R
 import com.example.selectfromgallery.data.database.AppDatabase
 import com.example.selectfromgallery.data.database.ItemEntity
@@ -26,8 +35,13 @@ import com.example.selectfromgallery.databinding.ActivityMainBinding
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
 import com.example.selectfromgallery.ui.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import java.lang.Exception
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnBorrar.setOnClickListener { borrarImg() }
         binding.btnAbrirRV.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.btnInsert.setOnClickListener { insert() }
+        binding.btnCamera.setOnClickListener{ openCamera() }
     }
 
     private fun setObservers(){
@@ -76,7 +91,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.thumbnail.observe(this, Observer {
             Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().into(btnAbrirRV)
         })
-
+        viewModel._showThumbnail.observe(this, Observer {
+            if (it == true) btnAbrirRV.visibility = View.VISIBLE
+            if (it == false) btnAbrirRV.visibility = View.GONE
+        })
         uri.observe(this, Observer {
             if (it != Uri.EMPTY) showSelectedImagePad()
             else hideSelectedImagePad()
@@ -114,6 +132,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnEnviar.visibility = View.INVISIBLE
         binding.btnBorrar.visibility = View.INVISIBLE
         binding.btnInsert.visibility = View.INVISIBLE
+        //file.delete()
     }
 
     private fun requestPermission() {//permisos para abrir la gallery
@@ -140,10 +159,15 @@ class MainActivity : AppCompatActivity() {
 
         if (result.resultCode == Activity.RESULT_OK){
             val data = result.data?.data
-            uri.value = data!!
+            if (data == null){
+                uri.value = file.toUri()
+            } else {
+                uri.value = data!!
+            }
             itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
             showSelectedImagePad()
+            println("FOTO = ${uri.value}")
         }
     }
 
@@ -157,8 +181,10 @@ class MainActivity : AppCompatActivity() {
     private fun enviar() { //enviar img seleccionada de gallery
         val i = Intent(Intent.ACTION_SEND)
             .setType("image/*")
-            .putExtra(Intent.EXTRA_STREAM, uri.value)//.setPackage("com.whatsapp")
+            .putExtra(Intent.EXTRA_STREAM, uri.value)
+            .putExtra(Intent.EXTRA_TEXT, "Message sent from PrivateGallery")//.setPackage("com.whatsapp")
         val chooser = Intent(Intent.createChooser(i, "Enviar pic"))
+        println("URI = ${uri.value.toString()}")
 
         try { startActivity(chooser) }
         catch (e: Exception){ Toast.makeText(this, "Error de envio ${e.message}", Toast.LENGTH_SHORT).show() }
@@ -171,13 +197,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.borrarBtn -> delete()
+            R.id.borrarBtn -> deleteAll()
             else -> {}
         }
         return true
     }
 
-    private fun delete() = AlertDialog.Builder(this)
+    private fun deleteAll() = AlertDialog.Builder(this)
         .setTitle("ALERTA")
         .setMessage("¿Estas seguro que quieres borrar todo el contenido de la base de datos de SelectFromGallery?")
         .setPositiveButton("Si") { _, _ ->
@@ -185,4 +211,24 @@ class MainActivity : AppCompatActivity() {
         }
         .setNegativeButton("No") { _, _ -> }
         .create().show()
+
+    private lateinit var file: File
+    private fun openCamera(){
+        //las dos lineas siguientes permiten enviar imagenes recien tomadas
+        StrictMode.setVmPolicy(VmPolicy.Builder().build())
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.resolveActivity(packageManager).also {
+            createPhotoFile()
+            val fileUri:Uri = FileProvider.getUriForFile(
+                Objects.requireNonNull(applicationContext), BuildConfig.APPLICATION_ID + ".provider", file
+            ) //La linea de "fileUri" es impresindible que no se altere para que la app se ejecute correctamente
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
+        }
+        startForActivityGallery.launch(intent)
+    }
+
+    private fun createPhotoFile() {
+        val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        file = File.createTempFile("IMG_${System.currentTimeMillis()}",".jpg",dir)
+    }
 }

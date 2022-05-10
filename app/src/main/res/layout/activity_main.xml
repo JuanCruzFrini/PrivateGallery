@@ -64,7 +64,7 @@
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="500dp"
                 android:src="@drawable/ic_launcher_foreground" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -115,21 +115,19 @@
         android:layout_height="wrap_content"
         android:layout_margin="18dp"
         android:layout_marginStart="67dp"
-        android:visibility="gone"
         android:text="insert"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnGallery" />
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!--<Button
-        android:id="@+id/btnDelete"
+    <Button
+        android:id="@+id/btnCamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="18dp"
-        android:text="delete All"
-        android:visibility="visible"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnEnviar"
-        app:layout_constraintStart_toStartOf="parent" />-->
+        android:text="Camera"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnGallery" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
+<paths>
 
 <!-- supuesto proveedor de content para autorizar el permiso de uso de la Media del device -->
 
     <external-path
-        name="external"
-        path="." />
-    <external-files-path
         name="external_files"
         path="." />
+   <!-- <external-files-path
+        name="external_files"
+        path="/" />
     <cache-path
         name="cache"
-        path="." />
+        path="/" />
     <external-cache-path
         name="external_cache"
-        path="." />
+        path="/" />
     <files-path
         name="files"
-        path="." />
+        path="/" />-->
 
 </paths>

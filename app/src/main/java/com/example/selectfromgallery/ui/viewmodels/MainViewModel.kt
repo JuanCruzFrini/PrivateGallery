@@ -22,19 +22,22 @@ class MainViewModel : ViewModel() {
     private val _thumbnail = MutableLiveData<ItemEntity>()
     val thumbnail: LiveData<ItemEntity> = _thumbnail
 
+    val _showThumbnail = MutableLiveData<Boolean>()
+
     fun onCreate(context: Context){
         viewModelScope.launch {
             _isLoading.value = true
+            _showThumbnail.value = false
             val result = GetImagesUseCase(context).invoke()
 
             if (!result.isNullOrEmpty()){
                 _listRecycler.postValue(result!!)
                 _thumbnail.postValue(result.first())
+                _showThumbnail.value = true
                 _isLoading.value = false
             }
         }
     }
-
     fun delete(context: Context){
         viewModelScope.launch(Dispatchers.IO) {
             ImageRepository(context).deleteAll()
