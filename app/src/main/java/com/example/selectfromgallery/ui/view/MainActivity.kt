@@ -174,13 +174,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.borrarBtn -> deletee()
+            R.id.borrarBtn -> delete()
             else -> {}
         }
         return true
     }
 
-    private fun deletee() = AlertDialog.Builder(this)
+    private fun delete() = AlertDialog.Builder(this)
         .setTitle("ALERTA")
         .setMessage("¿Estas seguro que quieres borrar todo el contenido de la base de datos de SelectFromGallery?")
         .setPositiveButton("Si") { _, _ ->
