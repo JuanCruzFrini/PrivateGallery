@@ -30,13 +30,4 @@ class RecyclerActivityViewModel : ViewModel() {
             }
         }
     }
-
-/*
-    fun delete(context: Context){
-        viewModelScope.launch {
-            val result = ImageRepository(context).itemDao.deleteAll()
-            _listRecycler.postValue(result as List<ItemEntity>)
-        }
-    }
-*/
 }
