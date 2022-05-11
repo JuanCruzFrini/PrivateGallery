@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -22,9 +23,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.BuildConfig
@@ -96,7 +99,15 @@ class MainActivity : AppCompatActivity() {
             if (it == false) btnAbrirRV.visibility = View.GONE
         })
         uri.observe(this, Observer {
-            if (it != Uri.EMPTY) showSelectedImagePad()
+            if (it != Uri.EMPTY){
+                showSelectedImagePad()
+
+                if (file != null) {
+                    val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
+                    val colors = palette.swatches
+                    image.setBackgroundColor(colors.random().rgb ?: R.color.black )
+                }
+            }
             else hideSelectedImagePad()
         })
     }
@@ -160,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK){
             val data = result.data?.data
             if (data == null){
-                uri.value = file.toUri()
+                uri.value = file!!.toUri()
             } else {
                 uri.value = data!!
             }
@@ -212,7 +223,8 @@ class MainActivity : AppCompatActivity() {
         .setNegativeButton("No") { _, _ -> }
         .create().show()
 
-    private lateinit var file: File
+    //private lateinit var file: File
+    private var file:File? = null
     private fun openCamera(){
         //las dos lineas siguientes permiten enviar imagenes recien tomadas
         StrictMode.setVmPolicy(VmPolicy.Builder().build())
@@ -220,7 +232,7 @@ class MainActivity : AppCompatActivity() {
         intent.resolveActivity(packageManager).also {
             createPhotoFile()
             val fileUri:Uri = FileProvider.getUriForFile(
-                Objects.requireNonNull(applicationContext), BuildConfig.APPLICATION_ID + ".provider", file
+                Objects.requireNonNull(applicationContext), BuildConfig.APPLICATION_ID + ".provider", file!!
             ) //La linea de "fileUri" es impresindible que no se altere para que la app se ejecute correctamente
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
         }
@@ -230,5 +242,12 @@ class MainActivity : AppCompatActivity() {
     private fun createPhotoFile() {
         val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         file = File.createTempFile("IMG_${System.currentTimeMillis()}",".jpg",dir)
+    }
+
+    private fun createPaletteSync(bitmap: Bitmap) : Palette = Palette.from(bitmap).generate()
+
+    private fun createPaletteAsync(bitmap: Bitmap) {
+        Palette.from(bitmap).generate{
+        }
     }
 }
