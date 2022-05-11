@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
 
-<!-- supuesto proveedor de content para autorizar el permiso de uso de la Media del device -->
+<!-- Content provider para autorizar el permiso de uso de la Media del device -->
 
     <external-path
         name="external_files"

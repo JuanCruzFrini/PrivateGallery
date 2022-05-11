@@ -23,7 +23,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -45,7 +44,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var db:AppDatabase
@@ -54,13 +52,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var uri: MutableLiveData<Uri>
     private lateinit var itemSelected:ItemEntity
 
-    private val viewModel:MainViewModel by viewModels()
     private lateinit var adapter:ItemAdapter
+    private val viewModel:MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         uri = MutableLiveData<Uri>()
         uri.value = Uri.EMPTY
 
@@ -71,12 +70,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setListeners() {
-        binding.btnGallery.setOnClickListener { requestPermission() }
+        binding.btnGallery.setOnClickListener { requestReadExtStorPermission() }
         binding.btnEnviar.setOnClickListener { enviar() }
         binding.btnBorrar.setOnClickListener { borrarImg() }
         binding.btnAbrirRV.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.btnInsert.setOnClickListener { insert() }
-        binding.btnCamera.setOnClickListener{ openCamera() }
+        binding.btnCamera.setOnClickListener{ requestCameraPermission() }
     }
 
     private fun setObservers(){
@@ -99,15 +98,7 @@ class MainActivity : AppCompatActivity() {
             if (it == false) btnAbrirRV.visibility = View.GONE
         })
         uri.observe(this, Observer {
-            if (it != Uri.EMPTY){
-                showSelectedImagePad()
-
-                if (file != null) {
-                    val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
-                    val colors = palette.swatches
-                    image.setBackgroundColor(colors.random().rgb ?: R.color.black )
-                }
-            }
+            if (it != Uri.EMPTY){ showSelectedImagePad() }
             else hideSelectedImagePad()
         })
     }
@@ -131,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             MainProgress.visibility = View.VISIBLE
             withContext(Dispatchers.Default) { db.itemDao.insertItem(itemSelected) }
             MainProgress.visibility = View.INVISIBLE
-            borrarImg()
+            hideSelectedImagePad()
             viewModel.onCreate(this@MainActivity)
         }
         Toast.makeText(this, "Imagen insertada correctamente", Toast.LENGTH_SHORT).show()
@@ -139,55 +130,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun borrarImg() {
         uri.value = Uri.EMPTY
-        binding.image.setImageResource(R.drawable.ic_launcher_foreground)
-        binding.btnEnviar.visibility = View.INVISIBLE
-        binding.btnBorrar.visibility = View.INVISIBLE
-        binding.btnInsert.visibility = View.INVISIBLE
-        //file.delete()
+        hideSelectedImagePad()
+        if (file != null) file?.absoluteFile?.delete()
     }
 
-    private fun requestPermission() {//permisos para abrir la gallery
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) -> {
-                    pickPhotoFromGallery()
-                }
-                else -> requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        } else { pickPhotoFromGallery() }
-    }
-
-    //manejamos si se aceptan o no los permisos del Dialog
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()){ isGranted ->
-
-        if (isGranted) pickPhotoFromGallery()
-        else  Toast.makeText(this, "You need to enable the permission", Toast.LENGTH_SHORT).show()
-    }
-
-    //manejamos el resultado de la actividad a donde nos dirijimos
-    private val startForActivityGallery = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
-
-        if (result.resultCode == Activity.RESULT_OK){
-            val data = result.data?.data
-            if (data == null){
-                uri.value = file!!.toUri()
-            } else {
-                uri.value = data!!
-            }
-            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
-            Glide.with(this).load(uri.value).fitCenter().into(binding.image)
-            showSelectedImagePad()
-            println("FOTO = ${uri.value}")
-        }
-    }
-
-    private fun pickPhotoFromGallery() { //agarramos la foto de gallery
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*")
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        startForActivityGallery.launch(intent)
-        //val intent = Intent(Intent.ACTION_GET_CONTENT)
-    }
+    private fun deleteAll() = AlertDialog.Builder(this)
+        .setTitle("ALERTA")
+        .setMessage("¿Estas seguro que quieres borrar todo el contenido de la base de datos de SelectFromGallery?")
+        .setPositiveButton("Si") { _, _ -> viewModel.delete(this) }
+        .setNegativeButton("No") { _, _ -> }
+        .create().show()
 
     private fun enviar() { //enviar img seleccionada de gallery
         val i = Intent(Intent.ACTION_SEND)
@@ -201,27 +153,68 @@ class MainActivity : AppCompatActivity() {
         catch (e: Exception){ Toast.makeText(this, "Error de envio ${e.message}", Toast.LENGTH_SHORT).show() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_overflow, menu)
-        return true
+    //camera functions
+    private fun requestCameraPermission(){
+        when (PackageManager.PERMISSION_GRANTED){
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) -> { openCamera() }
+            else -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+    private val requestCameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) openCamera()
+        else Toast.makeText(this, "Permite el uso de Camara para continuar", Toast.LENGTH_SHORT).show()
+    }
+    private val startForActivityCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
+        if (result.resultCode == Activity.RESULT_OK){
+            uri.value = file!!.toUri()
+            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
+            Glide.with(this).load(uri.value).fitCenter().into(binding.image)
+            showSelectedImagePad()
+            println("FOTO startForCamera = ${uri.value}")
+            val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
+            val colors:List<Palette.Swatch>? = palette.swatches
+            image.setBackgroundColor(colors?.random()?.rgb ?: R.color.purple_500 )
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.borrarBtn -> deleteAll()
-            else -> {}
+    //Gallery functions
+    private fun requestReadExtStorPermission() {//permisos para abrir la gallery
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
+                    pickPhotoFromGallery()
+                }
+                else -> requestReadExtStorPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        } else { pickPhotoFromGallery() }
+    }
+    private val requestReadExtStorPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()){ isGranted ->
+        if (isGranted) pickPhotoFromGallery()
+        else  Toast.makeText(this, "Permite el uso de Escritura de almacenamiento para continuar", Toast.LENGTH_LONG).show()
+    }
+    private val startForActivityGallery = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
+        if (result.resultCode == Activity.RESULT_OK){
+            val data = result.data?.data
+            if (data == null){
+                uri.value = file!!.toUri()
+            } else {
+                uri.value = data!!
+            }
+            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
+            Glide.with(this).load(uri.value).fitCenter().into(binding.image)
+            showSelectedImagePad()
+            println("FOTO startForGallery= ${uri.value}")
         }
-        return true
     }
 
-    private fun deleteAll() = AlertDialog.Builder(this)
-        .setTitle("ALERTA")
-        .setMessage("¿Estas seguro que quieres borrar todo el contenido de la base de datos de SelectFromGallery?")
-        .setPositiveButton("Si") { _, _ ->
-            viewModel.delete(this)
-        }
-        .setNegativeButton("No") { _, _ -> }
-        .create().show()
+    private fun pickPhotoFromGallery() { //agarramos la foto de gallery
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*")
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        startForActivityGallery.launch(intent)
+        //val intent = Intent(Intent.ACTION_GET_CONTENT)
+    }
 
     //private lateinit var file: File
     private var file:File? = null
@@ -236,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             ) //La linea de "fileUri" es impresindible que no se altere para que la app se ejecute correctamente
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
         }
-        startForActivityGallery.launch(intent)
+        startForActivityCamera.launch(intent)
     }
 
     private fun createPhotoFile() {
@@ -245,9 +238,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createPaletteSync(bitmap: Bitmap) : Palette = Palette.from(bitmap).generate()
+    private fun createPaletteAsync(bitmap: Bitmap) { Palette.from(bitmap).generate{} }
 
-    private fun createPaletteAsync(bitmap: Bitmap) {
-        Palette.from(bitmap).generate{
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_overflow, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.borrarBtn -> deleteAll()
+            else -> {}
         }
+        return true
     }
 }
