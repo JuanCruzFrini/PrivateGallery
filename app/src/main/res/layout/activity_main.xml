@@ -86,7 +86,7 @@
 
     <ImageButton
         android:src="@mipmap/ic_launcher"
-        android:id="@+id/btnAbrirRV"
+        android:id="@+id/btn_open_rv"
         android:text="RV"
         android:layout_width="50dp"
         android:layout_height="50dp"

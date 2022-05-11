@@ -24,10 +24,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.BuildConfig
 import com.example.selectfromgallery.R
@@ -37,10 +40,7 @@ import com.example.selectfromgallery.databinding.ActivityMainBinding
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
 import com.example.selectfromgallery.ui.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 
@@ -71,9 +71,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setListeners() {
         binding.btnGallery.setOnClickListener { requestReadExtStorPermission() }
-        binding.btnEnviar.setOnClickListener { enviar() }
-        binding.btnBorrar.setOnClickListener { borrarImg() }
-        binding.btnAbrirRV.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
+        binding.btnEnviar.setOnClickListener { send() }
+        binding.btnBorrar.setOnClickListener { deleteImageSelected() }
+        binding.btnOpenRv.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.btnInsert.setOnClickListener { insert() }
         binding.btnCamera.setOnClickListener{ requestCameraPermission() }
     }
@@ -85,36 +85,23 @@ class MainActivity : AppCompatActivity() {
             adapter = ItemAdapter(it)
             mainRv.adapter = adapter
             mainRv.layoutManager = GridLayoutManager(this, 2)//LinearLayoutManager(this)
+            ViewCompat.setNestedScrollingEnabled(mainRv, false)//agrega fluidez al rv
         })
         viewModel.isLoading.observe(this, Observer {
             if (it == true) MainProgress.visibility = View.VISIBLE
             if (it == false) MainProgress.visibility = View.GONE
         })
         viewModel.thumbnail.observe(this, Observer {
-            Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().into(btnAbrirRV)
+            Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().into(binding.btnOpenRv)
         })
         viewModel._showThumbnail.observe(this, Observer {
-            if (it == true) btnAbrirRV.visibility = View.VISIBLE
-            if (it == false) btnAbrirRV.visibility = View.GONE
+            if (it == true) binding.btnOpenRv.visibility = View.VISIBLE
+            if (it == false) binding.btnOpenRv.visibility = View.GONE
         })
         uri.observe(this, Observer {
             if (it != Uri.EMPTY){ showSelectedImagePad() }
             else hideSelectedImagePad()
         })
-    }
-
-    private fun showSelectedImagePad() {
-        binding.image.visibility = View.VISIBLE
-        binding.btnEnviar.visibility = View.VISIBLE
-        binding.btnBorrar.visibility = View.VISIBLE
-        binding.btnInsert.visibility = View.VISIBLE
-    }
-
-    private fun hideSelectedImagePad() {
-        binding.image.visibility = View.GONE
-        binding.btnEnviar.visibility = View.GONE
-        binding.btnBorrar.visibility = View.GONE
-        binding.btnInsert.visibility = View.GONE
     }
 
     private fun insert() {
@@ -128,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Imagen insertada correctamente", Toast.LENGTH_SHORT).show()
     }
 
-    private fun borrarImg() {
+    private fun deleteImageSelected() {
         uri.value = Uri.EMPTY
         hideSelectedImagePad()
         if (file != null) file?.absoluteFile?.delete()
@@ -141,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         .setNegativeButton("No") { _, _ -> }
         .create().show()
 
-    private fun enviar() { //enviar img seleccionada de gallery
+    private fun send() { //enviar img seleccionada de gallery
         val i = Intent(Intent.ACTION_SEND)
             .setType("image/*")
             .putExtra(Intent.EXTRA_STREAM, uri.value)
@@ -151,31 +138,6 @@ class MainActivity : AppCompatActivity() {
 
         try { startActivity(chooser) }
         catch (e: Exception){ Toast.makeText(this, "Error de envio ${e.message}", Toast.LENGTH_SHORT).show() }
-    }
-
-    //camera functions
-    private fun requestCameraPermission(){
-        when (PackageManager.PERMISSION_GRANTED){
-            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) -> { openCamera() }
-            else -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-    private val requestCameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) openCamera()
-        else Toast.makeText(this, "Permite el uso de Camara para continuar", Toast.LENGTH_SHORT).show()
-    }
-    private val startForActivityCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
-        if (result.resultCode == Activity.RESULT_OK){
-            uri.value = file!!.toUri()
-            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
-            Glide.with(this).load(uri.value).fitCenter().into(binding.image)
-            showSelectedImagePad()
-            println("FOTO startForCamera = ${uri.value}")
-            val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
-            val colors:List<Palette.Swatch>? = palette.swatches
-            image.setBackgroundColor(colors?.random()?.rgb ?: R.color.purple_500 )
-        }
     }
 
     //Gallery functions
@@ -208,7 +170,6 @@ class MainActivity : AppCompatActivity() {
             println("FOTO startForGallery= ${uri.value}")
         }
     }
-
     private fun pickPhotoFromGallery() { //agarramos la foto de gallery
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).setType("image/*")
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -216,7 +177,30 @@ class MainActivity : AppCompatActivity() {
         //val intent = Intent(Intent.ACTION_GET_CONTENT)
     }
 
-    //private lateinit var file: File
+    //camera functions
+    private fun requestCameraPermission(){
+        when (PackageManager.PERMISSION_GRANTED){
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) -> { openCamera() }
+            else -> requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+    private val requestCameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) openCamera()
+        else Toast.makeText(this, "Permite el uso de Camara para continuar", Toast.LENGTH_SHORT).show()
+    }
+    private val startForActivityCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
+        if (result.resultCode == Activity.RESULT_OK){
+            uri.value = file!!.toUri()
+            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
+            Glide.with(this).load(uri.value).fitCenter().into(binding.image)
+            showSelectedImagePad()
+            println("FOTO startForCamera = ${uri.value}")
+            val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
+            val colors:List<Palette.Swatch>? = palette.swatches
+            image.setBackgroundColor(colors?.random()?.rgb ?: R.color.purple_500 )
+        }
+    }
     private var file:File? = null
     private fun openCamera(){
         //las dos lineas siguientes permiten enviar imagenes recien tomadas
@@ -231,7 +215,6 @@ class MainActivity : AppCompatActivity() {
         }
         startForActivityCamera.launch(intent)
     }
-
     private fun createPhotoFile() {
         val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         file = File.createTempFile("IMG_${System.currentTimeMillis()}",".jpg",dir)
@@ -240,11 +223,24 @@ class MainActivity : AppCompatActivity() {
     private fun createPaletteSync(bitmap: Bitmap) : Palette = Palette.from(bitmap).generate()
     private fun createPaletteAsync(bitmap: Bitmap) { Palette.from(bitmap).generate{} }
 
+    private fun showSelectedImagePad() {
+        binding.image.visibility = View.VISIBLE
+        binding.btnEnviar.visibility = View.VISIBLE
+        binding.btnBorrar.visibility = View.VISIBLE
+        binding.btnInsert.visibility = View.VISIBLE
+    }
+    private fun hideSelectedImagePad() {
+        binding.image.visibility = View.GONE
+        binding.btnEnviar.visibility = View.GONE
+        binding.btnBorrar.visibility = View.GONE
+        binding.btnInsert.visibility = View.GONE
+    }
+
+    //menu overflow
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_overflow, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.borrarBtn -> deleteAll()
