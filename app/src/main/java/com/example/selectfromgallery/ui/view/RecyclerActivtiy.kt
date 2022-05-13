@@ -9,13 +9,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.selectfromgallery.R
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
-import com.example.selectfromgallery.ui.viewmodels.RecyclerActivityViewModel
+import com.example.selectfromgallery.ui.viewmodels.RecyclerViewModel
 import kotlinx.android.synthetic.main.activity_recycler_activtiy.*
 
 class RecyclerActivtiy : AppCompatActivity() {
 
     private lateinit var adapter: ItemAdapter
-    private val viewModel: RecyclerActivityViewModel by viewModels()
+    private val viewModel: RecyclerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -10,7 +10,7 @@ import com.example.selectfromgallery.data.database.ItemEntity
 import com.example.selectfromgallery.domain.usecase.GetImagesUseCase
 import kotlinx.coroutines.launch
 
-class RecyclerActivityViewModel : ViewModel() {
+class RecyclerViewModel : ViewModel() {
 
     private val _listRecycler = MutableLiveData<List<ItemEntity>>()
     val listaRecycler:LiveData<List<ItemEntity>> = _listRecycler

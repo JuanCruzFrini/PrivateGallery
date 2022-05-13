@@ -89,14 +89,13 @@
         android:layout_height="wrap_content"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="#BF3700B3"
         android:padding="8dp"
         tools:ignore="BottomAppBar">
 
         <ImageButton
             android:src="@mipmap/ic_launcher"
             android:id="@+id/btn_open_rv"
-            android:backgroundTint="#BF6200EE"
+            android:backgroundTint="@color/coral"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="24dp"

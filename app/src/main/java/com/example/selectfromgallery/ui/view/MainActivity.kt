@@ -151,7 +151,6 @@ class MainActivity : AppCompatActivity() {
             .putExtra(Intent.EXTRA_STREAM, uri.value)
             .putExtra(Intent.EXTRA_TEXT, "Message sent from PrivateGallery")//.setPackage("com.whatsapp")
         val chooser = Intent(Intent.createChooser(i, "Enviar pic"))
-        println("URI = ${uri.value.toString()}")
 
         try { startActivity(chooser) }
         catch (e: Exception){ Toast.makeText(this, "Error de envio ${e.message}", Toast.LENGTH_SHORT).show() }
@@ -184,7 +183,6 @@ class MainActivity : AppCompatActivity() {
             itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray(), fecha = Calendar.getInstance().time.toString())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
             showSelectedImagePad()
-            println("FOTO startForGallery= ${uri.value}")
         }
     }
     private fun pickPhotoFromGallery() { //agarramos la foto de gallery

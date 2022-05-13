@@ -12,9 +12,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginStart="18dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="18dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/cardview_dark_background" />
 
     <TextView
