@@ -31,7 +31,6 @@ class RecyclerActivtiy : AppCompatActivity() {
             RV.adapter = adapter
             RV.layoutManager = GridLayoutManager(this, 2)
         })
-
         viewModel.isLoading.observe(this, Observer {
             if (it == true) loading.visibility = View.VISIBLE
             if (it == false) loading.visibility = View.GONE

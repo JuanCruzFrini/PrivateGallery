@@ -1,5 +1,6 @@
 package com.example.selectfromgallery.domain.adapter
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.R
 import com.example.selectfromgallery.data.database.ItemEntity
+import com.example.selectfromgallery.ui.view.DetailActivity
 import kotlinx.android.synthetic.main.item_list.view.*
 
 class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -21,8 +23,7 @@ class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Adapter<
         holder.txt.text = itemList[position].id.toString()
         //holder.imagen.setImageURI(itemList[position].imagen.decodeToString().toUri()
 
-        //al usar glide la carga es mas fluida
-        Glide
+        Glide //al usar glide la carga es mas fluida
             .with(holder.itemView.context)
             .load(itemList[position].imagen.decodeToString().toUri())
             .placeholder(R.drawable.ic_launcher_foreground)
@@ -35,5 +36,13 @@ class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Adapter<
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val imagen = itemView.itemImg
         val txt = itemView.itemTxtId
+
+        init {
+            itemView.setOnClickListener{
+                val context = itemView.context
+                context.startActivity(Intent(context, DetailActivity::class.java)
+                    .putExtra("ID", itemList[adapterPosition].id))
+            }
+        }
     }
 }

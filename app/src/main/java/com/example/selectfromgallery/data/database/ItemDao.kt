@@ -8,6 +8,9 @@ interface ItemDao {
     @Query("SELECT * FROM item_database ORDER BY id DESC")
     fun getAllItems():List<ItemEntity>?
 
+    @Query("SELECT * FROM item_database WHERE id= :id")
+    fun selectById(id:Long): ItemEntity
+
     @Query("DELETE FROM item_database WHERE id= :id")
     fun deleteById(id:Long)
 

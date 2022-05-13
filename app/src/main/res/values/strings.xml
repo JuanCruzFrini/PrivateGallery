@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Private Gallery</string>
+    <string name="prefs_file">com.example.selectfromgallery.PREFERENCE_FILE_key</string>
 </resources>

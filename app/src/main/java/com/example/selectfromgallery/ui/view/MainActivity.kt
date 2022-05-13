@@ -3,6 +3,7 @@ package com.example.selectfromgallery.ui.view
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -25,12 +26,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.BuildConfig
 import com.example.selectfromgallery.R
@@ -56,6 +55,10 @@ class MainActivity : AppCompatActivity() {
     private val viewModel:MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!intent.hasExtra("active")){
+            login()
+            onStop()
+        }
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -67,6 +70,20 @@ class MainActivity : AppCompatActivity() {
 
         setObservers()
         setListeners()
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Tu sesión se cerrará al salir")
+            .setPositiveButton("Continuar") {_, _ -> finishAffinity()}
+            .setNegativeButton("Cancelar") { _, _ -> }
+            .create().show()
+    }
+
+    private fun login() {
+        val prefs = getSharedPreferences(getString(com.example.selectfromgallery.R.string.prefs_file), Context.MODE_PRIVATE)
+        if (prefs.contains("password")) startActivity(Intent(this, LoginActivity::class.java))
+        else startActivity(Intent(this, RegistroActivity::class.java))
     }
 
     private fun setListeners() {
@@ -164,7 +181,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 uri.value = data!!
             }
-            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
+            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray(), fecha = Calendar.getInstance().time.toString())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
             showSelectedImagePad()
             println("FOTO startForGallery= ${uri.value}")
@@ -192,7 +209,7 @@ class MainActivity : AppCompatActivity() {
     private val startForActivityCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
         if (result.resultCode == Activity.RESULT_OK){
             uri.value = file!!.toUri()
-            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray())
+            itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray(), fecha = Calendar.getInstance().time.toString())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
             showSelectedImagePad()
             println("FOTO startForCamera = ${uri.value}")
