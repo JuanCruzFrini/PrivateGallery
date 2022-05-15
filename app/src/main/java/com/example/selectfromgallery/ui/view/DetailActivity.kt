@@ -28,6 +28,7 @@ class DetailActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
 
         id = intent.extras?.get("ID").toString().toLong() ?: 1L
         db = AppDatabase.getInstance(this)!!
@@ -53,9 +54,11 @@ class DetailActivity : AppCompatActivity(){
         AlertDialog.Builder(this)
             .setTitle("Informacion:")
             .setMessage(
-                        "ID: ${imageEntity.id.toString()}\n" +
-                        "URI: ${imageEntity.imagen.decodeToString()}\n" +
-                        "Fecha de carga: ${imageEntity.fecha}")
+                "ID: ${imageEntity.id}\n" +
+                        "Favorito: ${imageEntity.favorito}\n" +
+                        "Fecha de carga: ${imageEntity.fecha}\n" +
+                        "URI: ${imageEntity.imagen.decodeToString()}"
+            )
             .setNeutralButton("Aceptar") { _, _ -> }
             .create().show()
     }

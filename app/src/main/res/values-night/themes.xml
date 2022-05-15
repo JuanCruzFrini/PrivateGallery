@@ -26,4 +26,8 @@
         <item name="bottomAppBarStyle"> @color/orange_dark </item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="NoActionBar" parent="Theme.SelectFromGallery.New">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
 </resources>

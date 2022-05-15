@@ -21,4 +21,8 @@ class ImageRepository(context: Context) {
     suspend fun deleteAll(){
         itemDao.deleteAll()
     }
+
+    fun setFav(id:Long, favorito:Boolean ){
+        itemDao.setFav(id,favorito)
+    }
 }

@@ -19,4 +19,7 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItem(item:ItemEntity)
+
+    @Query("UPDATE item_database SET favorito= :favorito WHERE id= :id")
+    fun setFav(id: Long, favorito:Boolean)
 }

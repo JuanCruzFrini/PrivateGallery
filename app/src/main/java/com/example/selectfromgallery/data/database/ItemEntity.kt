@@ -19,5 +19,8 @@ data class ItemEntity(
     val imagen: ByteArray,
 
     @ColumnInfo(name = "fecha")
-    val fecha:String
+    val fecha:String,
+
+    @ColumnInfo(name = "favorito")
+    val favorito:Boolean = false
 )
