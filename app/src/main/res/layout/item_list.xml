@@ -39,7 +39,7 @@
         android:layout_marginBottom="18dp"
         android:backgroundTint="#00000000"
         android:padding="8dp"
-        android:src="@drawable/ic_baseline_favorite_24"
+        android:src="@drawable/fav_icon"
         android:visibility="gone"/>
 
     <ImageButton
@@ -52,6 +52,6 @@
         android:layout_marginBottom="18dp"
         android:backgroundTint="#00000000"
         android:padding="8dp"
-        android:src="@drawable/ic_baseline_favorite_border_24" />
+        android:src="@drawable/fav_border_icon" />
 
 </RelativeLayout>

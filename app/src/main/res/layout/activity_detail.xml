@@ -31,25 +31,31 @@
         android:layout_gravity="bottom"
         tools:ignore="BottomAppBar">
 
-        <Button
+        <ImageView
             android:id="@+id/btnDelete"
             android:text="delete"
             android:layout_marginRight="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:src="@drawable/delete_icon"
+            android:background="#00AAAAAA"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="right" />
 
-        <Button
+        <ImageView
             android:id="@+id/btnEnviar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:background="#00AAAAAA"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/send_icon"
             android:layout_gravity="center"
             android:text="enviar" />
 
-        <Button
+        <ImageView
             android:id="@+id/btnInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:background="#00AAAAAA"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/info_icon"
             android:text="info"
             android:layout_marginLeft="16dp"
             android:layout_gravity="left"/>

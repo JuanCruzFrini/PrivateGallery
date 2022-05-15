@@ -6,34 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".ui.view.MainActivity">
 
-    <Button
+    <ImageView
+        android:elevation="10dp"
         android:id="@+id/btnInsert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00AAAAAA"
+        android:src="@drawable/insert_icon"
         android:layout_margin="18dp"
-        android:layout_marginStart="67dp"
         android:text="insert"
+        tools:visibility="visible"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageView
+        android:elevation="10dp"
+
         android:id="@+id/btnEnviar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="#00AAAAAA"
         android:text="enviar"
+        android:src="@drawable/send_icon"
+        tools:visibility="visible"
         android:visibility="invisible"
         android:layout_margin="18dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageView
+        android:elevation="10dp"
+
         android:id="@+id/btnBorrar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_margin="18dp"
+        android:background="#00AAAAAA"
         android:text="borrar"
+        android:src="@drawable/delete_icon"
+        tools:visibility="visible"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -65,6 +78,7 @@
                 android:src="@drawable/ic_launcher_foreground" />
 
             <TextView
+                android:id="@+id/txtRecientes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -76,11 +90,24 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mainRv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="500dp" />
+
+            <TextView
+                android:id="@+id/txtVerTodo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Ver todo"
+                android:textStyle="italic"
+                android:textColor="@color/coral"
+                app:layout_constraintTop_toBottomOf="@id/mainRv"
+                app:layout_constraintRight_toRightOf="parent"
+                android:gravity="center"/>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
 
     <ProgressBar
         android:visibility="gone"
@@ -104,29 +131,32 @@
         <ImageButton
             android:src="@mipmap/ic_launcher"
             android:id="@+id/btn_open_rv"
-            android:backgroundTint="@color/coral"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:background="#00AAAAAA"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginStart="24dp"
             android:layout_gravity="start"/>
 
-        <Button
+        <ImageView
             android:id="@+id/btnGallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginEnd="18dp"
+            android:background="#00AAAAAA"
+            android:src="@drawable/search_icon"
             android:text="gallery" />
 
-        <Button
+        <ImageView
             android:id="@+id/btnCamera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="end"
+            android:src="@drawable/camera_icon"
+            android:background="#00AAAAAA"
             android:layout_marginEnd="18dp"
             android:text="Camera" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

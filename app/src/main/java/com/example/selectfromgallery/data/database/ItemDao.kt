@@ -22,4 +22,7 @@ interface ItemDao {
 
     @Query("UPDATE item_database SET favorito= :favorito WHERE id= :id")
     fun setFav(id: Long, favorito:Boolean)
+
+    @Query("SELECT * FROM item_database WHERE favorito= :state ORDER BY id DESC")
+    fun getFavs(state:Boolean):List<ItemEntity>?
 }

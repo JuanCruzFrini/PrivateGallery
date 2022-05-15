@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.palette.graphics.Palette
@@ -39,6 +40,7 @@ import com.example.selectfromgallery.databinding.ActivityMainBinding
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
 import com.example.selectfromgallery.ui.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_recycler_activtiy.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
@@ -93,6 +95,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpenRv.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.btnInsert.setOnClickListener { insert() }
         binding.btnCamera.setOnClickListener{ requestCameraPermission() }
+        binding.txtVerTodo.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
+        binding.txtRecientes.setOnClickListener {
+            if (mainRv.isVisible) mainRv.visibility = View.GONE else mainRv.visibility = View.VISIBLE
+        }
     }
 
     private fun setObservers(){
@@ -109,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             if (it == false) MainProgress.visibility = View.GONE
         })
         viewModel.thumbnail.observe(this, Observer {
-            Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().into(binding.btnOpenRv)
+            Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().circleCrop().into(binding.btnOpenRv)
         })
         viewModel._showThumbnail.observe(this, Observer {
             if (it == true) binding.btnOpenRv.visibility = View.VISIBLE

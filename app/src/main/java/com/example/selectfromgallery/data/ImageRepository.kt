@@ -22,6 +22,10 @@ class ImageRepository(context: Context) {
         itemDao.deleteAll()
     }
 
+    fun getFavs() : List<ItemEntity>?{
+        return itemDao.getFavs(true)
+    }
+
     fun setFav(id:Long, favorito:Boolean ){
         itemDao.setFav(id,favorito)
     }

@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SelectFromGallery.New">
         <activity
-            android:name=".PasswordRecoverActivity"
+            android:name=".ui.view.PasswordRecoverActivity"
             android:exported="false" />
         <activity
             android:name=".ui.view.DetailActivity"

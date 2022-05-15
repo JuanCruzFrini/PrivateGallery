@@ -1,4 +1,4 @@
-package com.example.selectfromgallery
+package com.example.selectfromgallery.ui.view
 
 import android.content.Context
 import android.content.Intent
@@ -6,8 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
-import com.example.selectfromgallery.ui.view.MainActivity
-import kotlinx.android.synthetic.main.activity_login.*
+import com.example.selectfromgallery.R
 import kotlinx.android.synthetic.main.activity_login.btnIngresar
 import kotlinx.android.synthetic.main.activity_password_recover.*
 
