@@ -33,7 +33,7 @@ open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Ada
             .with(holder.itemView.context)
             .load(itemList[position].imagen.decodeToString().toUri())
             .placeholder(R.drawable.ic_launcher_foreground)
-            .error(R.drawable.ic_launcher_foreground)
+            .error(R.drawable.ic_launcher_foreground).centerCrop()
             .into(holder.imagen)
 
         if (itemList[position].favorito == true){
