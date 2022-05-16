@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.selectfromgallery.R
+import com.example.selectfromgallery.databinding.ActivityRecyclerActivtiyBinding
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
 import com.example.selectfromgallery.ui.viewmodels.RecyclerViewModel
 import kotlinx.android.synthetic.main.activity_recycler_activtiy.*
@@ -16,32 +17,45 @@ class RecyclerActivtiy : AppCompatActivity() {
 
     private lateinit var adapter: ItemAdapter
     private val viewModel: RecyclerViewModel by viewModels()
+    private lateinit var binding:ActivityRecyclerActivtiyBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recycler_activtiy)
+        binding = ActivityRecyclerActivtiyBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        setSwipeRefreshListener()
         setObservers()
         setListeners()
     }
 
+    private fun setSwipeRefreshListener() {
+        val swipe = binding.swipeLayout.apply {
+            setColorSchemeColors(resources.getColor(R.color.coral))
+        }
+        swipe.setOnRefreshListener {
+            setObservers()
+            swipe.isRefreshing = false
+        }
+    }
+
     private fun setListeners() {
         cbFav.setOnClickListener {
-            if (cbFav.isChecked) viewModel.seeFavs.value = true
-            if (!cbFav.isChecked) viewModel.seeFavs.postValue(false)
+            if (binding.cbFav.isChecked) viewModel.seeFavs.value = true
+            if (!binding.cbFav.isChecked) viewModel.seeFavs.postValue(false)
         }
     }
 
     private fun setObservers(){
         viewModel.onCreate(this)
         viewModel.listaRecycler.observe(this, Observer {
-                adapter = ItemAdapter(it!!)
-                RV.adapter = adapter
-                RV.layoutManager = GridLayoutManager(this, 2)
+            adapter = ItemAdapter(it!!)
+            binding.rvGallery.adapter = adapter
+            binding.rvGallery.layoutManager = GridLayoutManager(this, 2)
         })
         viewModel.isLoading.observe(this, Observer {
-            if (it == true) loading.visibility = View.VISIBLE
-            if (it == false) loading.visibility = View.GONE
+            if (it == true) binding.loading.visibility = View.VISIBLE
+            if (it == false) binding.loading.visibility = View.GONE
         })
         viewModel.seeFavs.observe(this, Observer {
             if (it == true) viewModel.getFavs(this)

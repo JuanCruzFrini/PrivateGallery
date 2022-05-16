@@ -40,7 +40,6 @@ import com.example.selectfromgallery.databinding.ActivityMainBinding
 import com.example.selectfromgallery.domain.adapter.ItemAdapter
 import com.example.selectfromgallery.ui.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_recycler_activtiy.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
@@ -97,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnCamera.setOnClickListener{ requestCameraPermission() }
         binding.txtVerTodo.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.txtRecientes.setOnClickListener {
-            if (mainRv.isVisible) mainRv.visibility = View.GONE else mainRv.visibility = View.VISIBLE
+            if (binding.mainRv.isVisible) mainRv.visibility = View.GONE else mainRv.visibility = View.VISIBLE
         }
     }
 
@@ -106,13 +105,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.listaRecycler.observe(this, Observer {
             viewModel.onCreate(this)
             adapter = ItemAdapter(it)
-            mainRv.adapter = adapter
-            mainRv.layoutManager = GridLayoutManager(this, 2)//LinearLayoutManager(this)
-            ViewCompat.setNestedScrollingEnabled(mainRv, false)//agrega fluidez al rv
+            binding.mainRv.adapter = adapter
+            binding.mainRv.layoutManager = GridLayoutManager(this, 2)//LinearLayoutManager(this)
+            ViewCompat.setNestedScrollingEnabled(binding.mainRv, false)//agrega fluidez al rv
         })
         viewModel.isLoading.observe(this, Observer {
-            if (it == true) MainProgress.visibility = View.VISIBLE
-            if (it == false) MainProgress.visibility = View.GONE
+            if (it == true) binding.MainProgress.visibility = View.VISIBLE
+            if (it == false) binding.MainProgress.visibility = View.GONE
         })
         viewModel.thumbnail.observe(this, Observer {
             Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().circleCrop().into(binding.btnOpenRv)
@@ -129,9 +128,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun insert() {
         CoroutineScope((Dispatchers.Main)).launch {
-            MainProgress.visibility = View.VISIBLE
+            binding.MainProgress.visibility = View.VISIBLE
             withContext(Dispatchers.Default) { db.itemDao.insertItem(itemSelected) }
-            MainProgress.visibility = View.INVISIBLE
+            binding.MainProgress.visibility = View.INVISIBLE
             hideSelectedImagePad()
             viewModel.onCreate(this@MainActivity)
         }
@@ -219,7 +218,7 @@ class MainActivity : AppCompatActivity() {
             println("FOTO startForCamera = ${uri.value}")
             val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
             val colors:List<Palette.Swatch>? = palette.swatches
-            image.setBackgroundColor(colors?.random()?.rgb ?: R.color.purple_500 )
+            binding.image.setBackgroundColor(colors?.random()?.rgb ?: R.color.purple_500 )
         }
     }
     private var file:File? = null

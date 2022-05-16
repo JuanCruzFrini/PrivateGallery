@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.R
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.*
 import java.util.concurrent.Executor
 
 class LoginActivity : AppCompatActivity() {
@@ -39,8 +40,9 @@ class LoginActivity : AppCompatActivity() {
                 }
                 override fun onAuthenticationSucceeded(result: androidx.biometric.BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
+                    showUnlockAnim()
                     startActivity(Intent(applicationContext, MainActivity::class.java).putExtra("active", ""))
-                    Toast.makeText(applicationContext, "Authentication succeed\nWelcome!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Authentication succeed", Toast.LENGTH_SHORT).show()
                 }
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
@@ -55,9 +57,16 @@ class LoginActivity : AppCompatActivity() {
         biometricPrompt.authenticate(promptInfo)
     }
 
+    private fun showUnlockAnim() {
+        unlockAnim.visibility = View.VISIBLE
+        unlockAnim.speed *= 3f
+        unlockAnim.playAnimation()
+    }
+
     private fun setListeners() {
         btnIngresar.setOnClickListener { verifyPassword() }
         txtRecuperarContraseña.setOnClickListener { startActivity(Intent(this, PasswordRecoverActivity::class.java)) }
+        btnLoginBiometrico.setOnClickListener { setBiometricLogin() }
     }
 
     private fun loadLogo() =
@@ -69,6 +78,7 @@ class LoginActivity : AppCompatActivity() {
         etPasswordRepeat.visibility = View.GONE
         txtClaveRecuperarContraseña.visibility = View.GONE
         txtContraseñaRepeat.visibility = View.GONE
+        btnLoginBiometrico.visibility = View.VISIBLE
     }
 
     private fun verifyPassword() {

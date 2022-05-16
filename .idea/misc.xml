@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/drawable/fav_icon.xml" value="0.261" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/drawable/ic_baseline_favorite_24.xml" value="0.2735" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/activity_detail.xml" value="0.22" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/activity_insert.xml" value="0.33" />
@@ -11,7 +12,7 @@
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/activity_password_recover.xml" value="0.36666666666666664" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/activity_recycler_activtiy.xml" value="0.25" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/activity_registro.xml" value="0.36666666666666664" />
-        <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/item_list.xml" value="1.0" />
+        <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/layout/item_list.xml" value="0.5" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/menu/menu_overflow.xml" value="0.1890625" />
         <entry key="..\:/DATOS USUARIO/Desktop/restapi/SelectFromGallery/app/src/main/res/xml/provider_paths_app.xml" value="0.1" />
       </map>

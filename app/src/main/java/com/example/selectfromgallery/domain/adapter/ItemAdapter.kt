@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.R
@@ -13,6 +14,9 @@ import com.example.selectfromgallery.data.database.AppDatabase
 import com.example.selectfromgallery.data.database.ItemEntity
 import com.example.selectfromgallery.ui.view.DetailActivity
 import kotlinx.android.synthetic.main.item_list.view.*
+import kotlinx.coroutines.delay
+import java.lang.Thread.sleep
+import kotlin.time.Duration.Companion.seconds
 
 open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
@@ -46,28 +50,40 @@ open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Ada
         val fav = itemView.itemFav
         val noFav = itemView.itemNoFav
 
+        val db = AppDatabase.getInstance(itemView.context)
+
         init {
-            val db = AppDatabase.getInstance(itemView.context)
-            imagen.setOnClickListener{
-                val context = itemView.context
-                context.startActivity(Intent(context, DetailActivity::class.java)
-                    .putExtra("ID", itemList[adapterPosition].id))
-            }
-            txt.setOnClickListener {
-                Toast.makeText(txt.context, "id  ${itemList[absoluteAdapterPosition].id}", Toast.LENGTH_SHORT).show()
-            }
-            fav.setOnClickListener {
-                fav.setImageResource(R.drawable.fav_border_icon)
-                fav.visibility = View.GONE
-                noFav.visibility = View.VISIBLE
-                db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), false)
-            }
-            noFav.setOnClickListener{
-                fav.setImageResource(R.drawable.fav_icon)
-                fav.visibility = View.VISIBLE
-                noFav.visibility = View.GONE
-                db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), true)
-            }
+           setListeners()
+        }
+
+        private fun setListeners(){
+            imagen.setOnClickListener{ goToDetail() }
+            fav.setOnClickListener { fav() }
+            noFav.setOnClickListener{ noFav() }
+        }
+
+        private fun goToDetail(){
+            val context = itemView.context
+            context.startActivity(Intent(context, DetailActivity::class.java)
+                .putExtra("ID", itemList[adapterPosition].id))
+        }
+
+        private fun noFav(){
+            fav.setImageResource(R.drawable.fav_icon)
+            fav.visibility = View.VISIBLE
+            noFav.visibility = View.GONE
+            db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), true)
+            fav.animate().alpha(1f).scaleX(2f).scaleX(1f).duration = 500
+            noFav.animate().alpha(0f).scaleX(2f).scaleX(1f).duration = 500
+        }
+
+        private fun fav(){
+            fav.setImageResource(R.drawable.fav_border_icon)
+            fav.visibility = View.GONE
+            noFav.visibility = View.VISIBLE
+            db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), false)
+            fav.animate().alpha(0f).scaleX(2f).scaleX(1f).duration = 500
+            noFav.animate().alpha(1f).scaleX(2f).scaleX(1f).duration = 500
         }
     }
 }

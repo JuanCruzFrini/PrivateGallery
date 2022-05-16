@@ -1,12 +1,16 @@
 package com.example.selectfromgallery.ui.view
 
+import android.app.VoiceInteractor
 import android.content.Intent
 import android.opengl.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricPrompt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.data.database.AppDatabase
@@ -16,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class DetailActivity : AppCompatActivity(){
 
@@ -80,12 +85,14 @@ class DetailActivity : AppCompatActivity(){
     }
 
     private fun send() {
+        StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().build())
         val intent = Intent(Intent.ACTION_SEND)
             .setType("image/*")
             .putExtra(Intent.EXTRA_STREAM, imageEntity.imagen.decodeToString().toUri())
             .putExtra(Intent.EXTRA_TEXT, "Message sent from Private Gallery")
         val chooser = Intent.createChooser(intent, "Titulo")
-        startActivity(chooser)
+        try { startActivity(chooser) }
+        catch (e:Exception) { Toast.makeText(this, "Error : ${e.message}", Toast.LENGTH_SHORT).show()}
     }
 
     var info = true
