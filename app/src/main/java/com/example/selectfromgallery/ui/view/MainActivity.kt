@@ -18,6 +18,8 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!intent.hasExtra("active")){
             login()
-            onStop()
+            //onStop()
         }
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -96,29 +98,40 @@ class MainActivity : AppCompatActivity() {
         binding.btnCamera.setOnClickListener{ requestCameraPermission() }
         binding.txtVerTodo.setOnClickListener { startActivity(Intent(this, RecyclerActivtiy::class.java)) }
         binding.txtRecientes.setOnClickListener {
-            if (binding.mainRv.isVisible) mainRv.visibility = View.GONE else mainRv.visibility = View.VISIBLE
+            if (binding.mainRv.isVisible) mainRv.hide() else mainRv.show()//visibility = View.VISIBLE
         }
     }
 
     private fun setObservers(){
         viewModel.onCreate(this)
         viewModel.listaRecycler.observe(this, Observer {
+            if (it.size > 9) binding.txtVerTodo.show() else binding.txtVerTodo.hide()
             viewModel.onCreate(this)
             adapter = ItemAdapter(it)
             binding.mainRv.adapter = adapter
-            binding.mainRv.layoutManager = GridLayoutManager(this, 2)//LinearLayoutManager(this)
+            binding.mainRv.layoutManager = GridLayoutManager(this, 3)//LinearLayoutManager(this)
             ViewCompat.setNestedScrollingEnabled(binding.mainRv, false)//agrega fluidez al rv
         })
         viewModel.isLoading.observe(this, Observer {
-            if (it == true) binding.MainProgress.visibility = View.VISIBLE
-            if (it == false) binding.MainProgress.visibility = View.GONE
+            if (it == true) binding.MainProgress.show()//visibility = View.VISIBLE
+            if (it == false) binding.MainProgress.hide()//visibility = View.GONE
         })
         viewModel.thumbnail.observe(this, Observer {
             Glide.with(this).load(it.imagen.decodeToString().toUri()).fitCenter().circleCrop().into(binding.btnOpenRv)
         })
         viewModel._showThumbnail.observe(this, Observer {
-            if (it == true) binding.btnOpenRv.visibility = View.VISIBLE
-            if (it == false) binding.btnOpenRv.visibility = View.GONE
+            if (it == true) {
+                binding.btnOpenRv.show()
+                binding.txtRecientes.show()
+                //binding.txtVerTodo.hide()
+                binding.txtEmptyListAdvice.hide()
+            }
+            if (it == false){
+                binding.btnOpenRv.hide()
+                binding.txtRecientes.hide()
+                //binding.txtVerTodo.hide()
+                binding.txtEmptyListAdvice.show()
+            }
         })
         uri.observe(this, Observer {
             if (it != Uri.EMPTY){ showSelectedImagePad() }
@@ -128,9 +141,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun insert() {
         CoroutineScope((Dispatchers.Main)).launch {
-            binding.MainProgress.visibility = View.VISIBLE
+            binding.MainProgress.show()//visibility = View.VISIBLE
             withContext(Dispatchers.Default) { db.itemDao.insertItem(itemSelected) }
-            binding.MainProgress.visibility = View.INVISIBLE
+            binding.MainProgress.hide()//visibility = View.INVISIBLE
             hideSelectedImagePad()
             viewModel.onCreate(this@MainActivity)
         }
@@ -141,6 +154,7 @@ class MainActivity : AppCompatActivity() {
         uri.value = Uri.EMPTY
         hideSelectedImagePad()
         if (file != null) file?.absoluteFile?.delete()
+        setObservers()
     }
 
     private fun deleteAll() = AlertDialog.Builder(this)
@@ -187,6 +201,7 @@ class MainActivity : AppCompatActivity() {
             }
             itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray(), fecha = Calendar.getInstance().time.toString())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
+            binding.txtEmptyListAdvice.hide()
             showSelectedImagePad()
         }
     }
@@ -215,6 +230,7 @@ class MainActivity : AppCompatActivity() {
             itemSelected = ItemEntity(imagen = uri.value.toString().encodeToByteArray(), fecha = Calendar.getInstance().time.toString())
             Glide.with(this).load(uri.value).fitCenter().into(binding.image)
             showSelectedImagePad()
+            binding.txtEmptyListAdvice.hide()
             println("FOTO startForCamera = ${uri.value}")
             val palette = createPaletteSync(BitmapFactory.decodeFile(file.toString()))
             val colors:List<Palette.Swatch>? = palette.swatches
@@ -244,16 +260,16 @@ class MainActivity : AppCompatActivity() {
     private fun createPaletteAsync(bitmap: Bitmap) { Palette.from(bitmap).generate{} }
 
     private fun showSelectedImagePad() {
-        binding.image.visibility = View.VISIBLE
-        binding.btnEnviar.visibility = View.VISIBLE
-        binding.btnBorrar.visibility = View.VISIBLE
-        binding.btnInsert.visibility = View.VISIBLE
+        binding.image.show()//visibility = View.VISIBLE
+        binding.btnEnviar.show()//visibility = View.VISIBLE
+        binding.btnBorrar.show()//visibility = View.VISIBLE
+        binding.btnInsert.show()//visibility = View.VISIBLE
     }
     private fun hideSelectedImagePad() {
-        binding.image.visibility = View.GONE
-        binding.btnEnviar.visibility = View.GONE
-        binding.btnBorrar.visibility = View.GONE
-        binding.btnInsert.visibility = View.GONE
+        binding.image.hide()//visibility = View.GONE
+        binding.btnEnviar.hide()//visibility = View.GONE
+        binding.btnBorrar.hide()//visibility = View.GONE
+        binding.btnInsert.hide()//visibility = View.GONE
     }
 
     //menu overflow
@@ -269,3 +285,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 }
+
+fun View.show(){ visibility = View.VISIBLE }
+fun View.hide(){ visibility = View.GONE }

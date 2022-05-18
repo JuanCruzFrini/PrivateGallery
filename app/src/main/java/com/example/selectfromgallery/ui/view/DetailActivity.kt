@@ -97,13 +97,13 @@ class DetailActivity : AppCompatActivity(){
 
     var info = true
     private fun showExtraInfo() {
-        binding.bottomAppBar.visibility = View.VISIBLE
-        binding.txtDate.visibility = View.VISIBLE
+        binding.bottomAppBar.show()//visibility = View.VISIBLE
+        binding.txtDate.show()//visibility = View.VISIBLE
         info = true
     }
     private fun hideExtraInfo() {
-        binding.bottomAppBar.visibility = View.GONE
-        binding.txtDate.visibility = View.GONE
+        binding.bottomAppBar.hide()//visibility = View.GONE
+        binding.txtDate.hide()//visibility = View.GONE
         info = false
     }
 }

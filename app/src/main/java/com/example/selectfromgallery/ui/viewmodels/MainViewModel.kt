@@ -36,6 +36,10 @@ class MainViewModel : ViewModel() {
                 _showThumbnail.value = true
                 _isLoading.value = false
             }
+            if (result.isNullOrEmpty()){
+                _showThumbnail.value = false
+                _isLoading.value = false
+            }
         }
     }
     fun delete(context: Context){

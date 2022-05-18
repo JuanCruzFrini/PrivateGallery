@@ -7,13 +7,17 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.selectfromgallery.R
+import com.example.selectfromgallery.databinding.ActivityLoginBinding
 import kotlinx.android.synthetic.main.activity_login.*
 
 class RegistroActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityLoginBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         welcomeDialog()
         setListeners()
@@ -31,21 +35,21 @@ class RegistroActivity : AppCompatActivity() {
             .create().show()
 
     private fun setListeners() {
-        btnIngresar.setOnClickListener { registerUser() }
+        binding.btnIngresar.setOnClickListener { registerUser() }
     }
 
     private fun adaptView() {
         title = "Registrate"
-        txtContraseña.text = "Ingresa una contraseña"
-        btnIngresar.text = "registrar"
-        txtRecuperarContraseña.visibility = View.GONE
+        binding.txtContraseA.text = "Ingresa una contraseña"
+        binding.btnIngresar.text = "registrar"
+        binding.txtRecuperarContraseA.hide()//visibility = View.GONE
     }
 
     private fun registerUser() {
-        val pw = etPassword.text.toString()
-        val keyRec = etClaveRecuperarPassword.text.toString()
+        val pw =  binding.etPassword.text.toString()
+        val keyRec =  binding.etClaveRecuperarPassword.text.toString()
         if (pw.length in 8..20) {
-            if (pw == etPasswordRepeat.text.toString()) {
+            if (pw ==  binding.etPasswordRepeat.text.toString()) {
                 if (keyRec.length in 4..12) {
                     getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE).edit().let {
                         it.putString("password", pw)
@@ -53,9 +57,9 @@ class RegistroActivity : AppCompatActivity() {
                         it.apply()
                     }
                     startActivity(Intent(this, MainActivity::class.java).putExtra("active", ""))
-                } else etClaveRecuperarPassword.error = "La clave de recuperación debe contener al menos 4 caracteres, sin exeder los 15"
-            } else etPasswordRepeat.error = "Las contraseñas no coinciden"
-        } else { etPassword.error = "La contraseña debe contener al menos 8 caracteres, sin exeder los 20" }
+                } else  binding.etClaveRecuperarPassword.error = "La clave de recuperación debe contener al menos 4 caracteres, sin exeder los 15"
+            } else  binding.etPasswordRepeat.error = "Las contraseñas no coinciden"
+        } else {  binding.etPassword.error = "La contraseña debe contener al menos 8 caracteres, sin exeder los 20" }
     }
 
     override fun onBackPressed() = finishAffinity()

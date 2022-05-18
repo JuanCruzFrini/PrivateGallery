@@ -51,11 +51,11 @@ class RecyclerActivtiy : AppCompatActivity() {
         viewModel.listaRecycler.observe(this, Observer {
             adapter = ItemAdapter(it!!)
             binding.rvGallery.adapter = adapter
-            binding.rvGallery.layoutManager = GridLayoutManager(this, 2)
+            binding.rvGallery.layoutManager = GridLayoutManager(this, 3)
         })
         viewModel.isLoading.observe(this, Observer {
-            if (it == true) binding.loading.visibility = View.VISIBLE
-            if (it == false) binding.loading.visibility = View.GONE
+            if (it == true) binding.loading.show()//visibility = View.VISIBLE
+            if (it == false) binding.loading.hide()//visibility = View.GONE
         })
         viewModel.seeFavs.observe(this, Observer {
             if (it == true) viewModel.getFavs(this)

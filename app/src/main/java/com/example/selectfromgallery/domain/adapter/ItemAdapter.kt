@@ -13,6 +13,8 @@ import com.example.selectfromgallery.R
 import com.example.selectfromgallery.data.database.AppDatabase
 import com.example.selectfromgallery.data.database.ItemEntity
 import com.example.selectfromgallery.ui.view.DetailActivity
+import com.example.selectfromgallery.ui.view.hide
+import com.example.selectfromgallery.ui.view.show
 import kotlinx.android.synthetic.main.item_list.view.*
 import kotlinx.coroutines.delay
 import java.lang.Thread.sleep
@@ -37,8 +39,8 @@ open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Ada
             .into(holder.imagen)
 
         if (itemList[position].favorito == true){
-            holder.fav.visibility = View.VISIBLE
-            holder.noFav.visibility = View.GONE
+            holder.fav.show()//visibility = View.VISIBLE
+            holder.noFav.hide()//visibility = View.GONE
         }
     }
 
@@ -70,8 +72,8 @@ open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Ada
 
         private fun noFav(){
             fav.setImageResource(R.drawable.fav_icon)
-            fav.visibility = View.VISIBLE
-            noFav.visibility = View.GONE
+            fav.show()//visibility = View.VISIBLE
+            noFav.hide()//visibility = View.GONE
             db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), true)
             fav.animate().alpha(1f).scaleX(2f).scaleX(1f).duration = 500
             noFav.animate().alpha(0f).scaleX(2f).scaleX(1f).duration = 500
@@ -79,8 +81,8 @@ open class ItemAdapter(private val itemList:List<ItemEntity>) : RecyclerView.Ada
 
         private fun fav(){
             fav.setImageResource(R.drawable.fav_border_icon)
-            fav.visibility = View.GONE
-            noFav.visibility = View.VISIBLE
+            fav.hide()//visibility = View.GONE
+            noFav.show()//visibility = View.VISIBLE
             db!!.itemDao.setFav(itemList[absoluteAdapterPosition].id.toLong(), false)
             fav.animate().alpha(0f).scaleX(2f).scaleX(1f).duration = 500
             noFav.animate().alpha(1f).scaleX(2f).scaleX(1f).duration = 500

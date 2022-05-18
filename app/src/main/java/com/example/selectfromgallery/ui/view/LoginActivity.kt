@@ -7,8 +7,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.selectfromgallery.R
+import com.example.selectfromgallery.databinding.ActivityLoginBinding
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import java.util.concurrent.Executor
@@ -19,13 +21,16 @@ class LoginActivity : AppCompatActivity() {
      lateinit var biometricPrompt:androidx.biometric.BiometricPrompt
      lateinit var promptInfo: androidx.biometric.BiometricPrompt.PromptInfo
 
+     private lateinit var binding: ActivityLoginBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        loadLogo()
         hideRegistroPad()
         setListeners()
-        loadLogo()
         setBiometricLogin()
     }
 
@@ -58,27 +63,33 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showUnlockAnim() {
-        unlockAnim.visibility = View.VISIBLE
-        unlockAnim.speed *= 3f
-        unlockAnim.playAnimation()
+        binding.unlockAnim.show()//visibility = View.VISIBLE
+        binding.unlockAnim.speed *= 3f
+        binding.unlockAnim.playAnimation()
     }
 
     private fun setListeners() {
-        btnIngresar.setOnClickListener { verifyPassword() }
-        txtRecuperarContraseña.setOnClickListener { startActivity(Intent(this, PasswordRecoverActivity::class.java)) }
-        btnLoginBiometrico.setOnClickListener { setBiometricLogin() }
+        binding.btnIngresar.setOnClickListener { verifyPassword() }
+        binding.txtRecuperarContraseA.setOnClickListener { startActivity(Intent(this, PasswordRecoverActivity::class.java)) }
+        binding.btnLoginBiometrico.setOnClickListener { setBiometricLogin() }
     }
 
-    private fun loadLogo() =
-        Glide.with(applicationContext).load(R.drawable.logo_transparente).into(findViewById(R.id.imageView))
+    private fun loadLogo() {
+        lifecycleScope.launch {
+            async(Dispatchers.Main) {
+                Glide.with(applicationContext).load(R.drawable.logo_transparente)
+                    .into(findViewById(R.id.imageView))
+            }.await()
+        }
+    }
 
     private fun hideRegistroPad() {
         title = "Login"
-        etClaveRecuperarPassword.visibility = View.GONE
-        etPasswordRepeat.visibility = View.GONE
-        txtClaveRecuperarContraseña.visibility = View.GONE
-        txtContraseñaRepeat.visibility = View.GONE
-        btnLoginBiometrico.visibility = View.VISIBLE
+        etClaveRecuperarPassword.hide()//visibility = View.GONE
+        etPasswordRepeat.hide()//visibility = View.GONE
+        txtClaveRecuperarContraseña.hide()//visibility = View.GONE
+        txtContraseñaRepeat.hide()//visibility = View.GONE
+        btnLoginBiometrico.show()//visibility = View.VISIBLE
     }
 
     private fun verifyPassword() {

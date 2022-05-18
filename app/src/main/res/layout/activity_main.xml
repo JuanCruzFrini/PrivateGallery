@@ -22,7 +22,6 @@
 
     <ImageView
         android:elevation="10dp"
-
         android:id="@+id/btnEnviar"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -38,7 +37,6 @@
 
     <ImageView
         android:elevation="10dp"
-
         android:id="@+id/btnBorrar"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -72,6 +70,7 @@
 
             <ImageView
                 android:id="@+id/image"
+                android:elevation="9dp"
                 android:layout_width="match_parent"
                 android:layout_height="550dp"
                 android:layout_marginTop="8dp"
@@ -90,7 +89,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mainRv"
                 android:layout_width="match_parent"
-                android:layout_height="500dp" />
+                android:minHeight="0dp"
+                android:layout_height="500dp"/>
 
             <TextView
                 android:id="@+id/txtVerTodo"
@@ -100,6 +100,8 @@
                 android:text="Ver todo"
                 android:textStyle="italic"
                 android:textColor="@color/coral"
+                android:visibility="gone"
+                tools:visibility="visible"
                 app:layout_constraintTop_toBottomOf="@id/mainRv"
                 app:layout_constraintRight_toRightOf="parent"
                 android:gravity="center"/>
@@ -158,5 +160,22 @@
             android:text="Camera" />
 
     </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <TextView
+        android:id="@+id/txtEmptyListAdvice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        android:text="Aun no hay nada por aquí..."
+        android:textSize="24sp"
+        android:textStyle="italic"
+        android:textColor="@color/coral"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
